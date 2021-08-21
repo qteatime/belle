@@ -1,5 +1,6 @@
 % crochet
 
+local singleton module;
 local enum step-result = sr-done, sr-continue;
 
 // -- Evaluating
@@ -29,7 +30,7 @@ command vm evaluate: (X is form--rule) do
 end
 
 command vm evaluate: (X is form--variable) do
-  self push-on-stack: self at: X.name;
+  self push-on-stack: (self.bindings value at: X.name);
 end
 
 command vm evaluate: (X is form--number) do
@@ -54,8 +55,16 @@ command vm evaluate: (X is form--text) do
   self rewrite: X.contents;
 end
 
+command vm evaluate: (X is native-value-form) do
+  self push-on-stack: X.value;
+end
+
 
 // -- Stack and application
+command vm push-on-stack: (Value is b-procedure) do
+  self.stack <- self.stack value prepend: Value;
+end
+
 command vm push-on-stack: Value do
   let Stack = self.stack value;
   condition
@@ -84,7 +93,7 @@ command vm apply: (Function is b-procedure) to: Value do
     end
 
     always do
-      self.stack <- self.stack value prepend: Function update-capture: Captured;
+      self.stack <- self.stack value prepend: (Function update-capture: Captured);
     end
   end
 end
@@ -94,9 +103,14 @@ command vm run-runction: (Fun is b-lambda) do
 end
 
 command vm run-function: (Fun is b-native-lambda) do
-  Fun.run(self);
+  Fun.run(self, Fun.matched);
 end
 
+command b-lambda update-capture: Capture =
+  new b-lambda(self.arity, Capture, self.body);
+
+command b-native-lambda update-capture: Capture =
+  new b-native-lambda(self.arity, self.matched, Capture, self.run);
 
 // -- Rewriting
 command vm rewrite: (Word is text) do
@@ -105,29 +119,47 @@ command vm rewrite: (Word is text) do
     when Match is error => self;
     when Match is ok do
       let Rule = Match value;
-      self apply-rewrite-rule: Rule;
+      self apply-rewrite-rule: Rule with: Word;
     end
   end
 end
 
-command vm apply-rewrite-rule: (Rule is user-rewrite-rule) do
+command vm apply-rewrite-rule: (Rule is user-rewrite-rule) with: Word do
+  let Program = self.program value;
+  let Replacement = module replacement: Rule.form.replacement with-context: Word program: Program;
   condition
     when Rule is-immediate do
-      self.program <- Rule.form.replacement ++ self.program value;
+      self.program <- Replacement ++ self.program value;
     end
 
     always do
-      self push-on-stack: new b-lambda(Rule arity, [], Rule.form.replacement);
+      self push-on-stack: new b-lambda(Rule arity, [], Replacement);
     end
   end
 end
 
-command vm apply-rewrite-rule: (Rule is native-rewrite-rule) do
+command vm apply-rewrite-rule: (Rule is native-rewrite-rule) with: Word do
   condition
-    when Rule is-immediate => Rule.run(self);
-    always => self push-on-stack: new b-native-lambda(Rule arity, [], Rule.run);
+    when Rule is-immediate => Rule.run(self, Word);
+    always => self push-on-stack: new b-native-lambda(Rule arity, Word, [], Rule.run);
   end
 end
+
+command module replacement: (Replacement is list<form>) with-context: Word program: Program do
+  Replacement map: (module form: _ with-context: Word program: Program);
+end
+
+command module form: form--matched with-context: Word program: _ =
+  new native-value-form(new b-string(Word));
+
+command module form: form--remaining with-context: _ program: Program0 do
+  let Program = Program0 map: (_ as value)
+                  |> _ as stream;
+  new native-value-form(new b-stream(Program));
+end
+
+command module form: X with-context: _ program: _ =
+  X;
 
 
 command vm rule: (Rule is rewrite-rule) applies-to: (Word is text) do
@@ -136,6 +168,10 @@ end
 
 
 command pattern--word applies-to: (Word is text) do
+  self.word === Word;
+end
+
+command native-word-pattern applies-to: (Word is text) do
   self.word === Word;
 end
 

@@ -15,7 +15,7 @@ command app run: Source do
   let Program = belle parse: Source;
   let VM = belle make-vm: Program;
   let Result = VM run-to-completion;
-  Result;
+  nothing;
 end
 
 command app show-ast: Source do

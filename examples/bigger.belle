@@ -1,5 +1,5 @@
-: rule bigger/0 = BIGGER.
-: rule faster/0 = F A S T E R.
-: rule stronger/0 = StRoNgEr.
+: rule bigger/0 = @display @uppercase ^ @display " ".
+: rule faster/0 = @display @uppercase ^ @display " ".
+: rule stronger/0 = @display @uppercase ^ @display " ".
 
 bigger, faster, stronger.

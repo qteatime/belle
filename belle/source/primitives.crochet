@@ -1,0 +1,88 @@
+% crochet
+
+open crochet.wrapper.node.io;
+
+local singleton ast;
+
+command vm current-program-as-stream =
+  new b-stream((self.program value map: (_ as value)) as stream);
+
+command vm pop-stack do
+  let Stack = self.stack value;
+  self.stack <- Stack rest;
+  Stack first;
+end
+
+command vm set: Name to: Value do
+  self.bindings <- self.bindings value at: Name put: Value;
+end
+
+
+command vm rewrite: (Word is text) arity: (N is integer) with: (Fun is ((vm, text) -> vm)) do
+  self.rules <- self.rules value append: new native-rewrite-rule(new native-word-pattern(Word), N, Fun);
+  self;
+end
+
+command vm add-primitive-rules do
+  self
+    // Store manipulation
+    | rewrite: "@set" arity: 2 with: { VM, _ in
+        let Name = VM pop-stack as text;
+        let Value = VM pop-stack;
+        VM set: Name to: Value;
+      }
+
+    // Stack functions
+    | rewrite: "@drop" arity: 0 with: { VM, _ in
+        VM pop-stack;
+      }
+
+    | rewrite: "@push" arity: 1 with: { VM, _ in
+        // nothing necessary here
+      }
+
+    // List functions
+    | rewrite: "@cons" arity: 2 with: { VM, _ in
+        let Tail = VM pop-stack;
+        let Head = VM pop-stack;
+        VM push-on-stack: (Head prepend: Tail);
+      }
+    
+    | rewrite: "@head" arity: 1 with: { VM, _ in
+        let List = VM pop-stack;
+        VM push-on-stack: (List first);
+      }
+
+    | rewrite: "@tail" arity: 1 with: { VM, _ in
+        let List = VM pop-stack;
+        VM push-on-stack: (List rest);
+      }
+
+    | rewrite: "@last" arity: 1 with: { VM, _ in
+        let List = VM pop-stack;
+        VM push-on-stack: List last;
+      }
+
+    // String functions
+    | rewrite: "@uppercase" arity: 1 with: { VM, _ in
+        let Value0 = VM pop-stack;
+        let Value = (Value0 as text) ascii to-upper-case to-text;
+        VM push-on-stack: new b-string(Value);
+      }
+
+    | rewrite: "@lowercase" arity: 1 with: { VM, _ in
+        let Value0 = VM pop-stack;
+        let Value = (Value0 as text) ascii to-lower-case to-text;
+        VM push-on-stack: new b-string(Value);
+      }
+    
+    // Display functions
+    | rewrite: "@display" arity: 1 with: { VM, _ in
+        let Value = VM pop-stack;
+        terminal write: (Value to-output);
+      }
+
+    | rewrite: "@line-break" arity: 0 with: { VM, _ in
+        terminal write-line: "";
+      }
+end

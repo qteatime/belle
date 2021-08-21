@@ -9,6 +9,8 @@
     "source/parser.crochet",
     "source/pretty-print.crochet",
     "source/evaluator.crochet",
+    "source/intrinsics.crochet",
+    "source/primitives.crochet",
     "source/bootstrap.crochet",
     "source/main.crochet"
   ],

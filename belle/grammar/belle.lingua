@@ -10,6 +10,8 @@ type form =
   | atom(info: interval, contents: text)
   | string(info: interval, contents: text)
   | block(info: interval, expressions: list<expression>)
+  | matched(info: interval)
+  | remaining(info: interval)
   | text(info: interval, contents: text)
 
 grammar Belle : program {
@@ -38,6 +40,8 @@ grammar Belle : program {
     | "#" n:number              -> form.number(meta, n)
     | "#" w:word                -> form.atom(meta, w)
     | s:string                  -> form.string(meta, s)
+    | id<"^rest">               -> form.remaining(meta)
+    | id<"^self">               -> form.matched(meta)
     | ~"." t:text_piece         -> t
     | "[" s e:expr_block s "]"  -> form.block(meta, e)
   
