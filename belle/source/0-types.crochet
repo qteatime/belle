@@ -9,6 +9,7 @@ type b-string(value is text) is value;
 type b-stream(value is stream) is value;
 type b-atom(name is text) is value;
 type b-form(form is form) is value;
+type b-block(forms is list<form>) is value;
 abstract b-procedure is value;
 type b-lambda(arity is integer, captured is list<value>, body is list<form>) is b-procedure;
 type b-native-lambda(arity is integer, matched is text, captured is list<value>, run is ((vm, text) -> vm)) is b-procedure;

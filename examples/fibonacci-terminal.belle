@@ -1,0 +1,26 @@
+: rule Round/0 = @set #program @cons ^self ^rest.
+
+: rule An/0 = @set #a #1
+              @set #b #1
+              @set #n #20
+              @set #fib @cons %a @cons %b @nil
+              @set #f [@set #r @add %a %b
+                       @set #a %b
+                       @set #b %r
+                       @set #fib @cons %r %fib
+                       @set #n @sub %n #1
+                       @if @eq %n #0 [%fib] [@apply %f]]
+              @apply %f.
+
+: rule A/0 = @display %program
+             @line-break
+             @display @pretty-print @reverse %fib.
+
+Round,
+Well, not quite,
+Not quite much as a circle, at least,
+Or an ellipsis,
+Not anything so ordinary,
+An spiral?
+Yes,
+A spiral.

@@ -1,5 +1,7 @@
 % crochet
 
+open crochet.debug;
+
 local singleton module;
 local enum step-result = sr-done, sr-continue;
 
@@ -48,7 +50,7 @@ command vm evaluate: (X is form--string) do
 end
 
 command vm evaluate: (X is form--block) do
-  self push-on-stack: new b-block(X);
+  self push-on-stack: new b-block(X.expressions);
 end
 
 command vm evaluate: (X is form--text) do
@@ -62,8 +64,11 @@ end
 
 // -- Stack and application
 command vm push-on-stack: (Value is b-procedure) do
-  self.stack <- self.stack value prepend: Value;
+  self push-on-stack-without-applying: Value;
 end
+
+command vm push-on-stack-without-applying: Value =
+  self.stack <- self.stack value prepend: Value;
 
 command vm push-on-stack: Value do
   let Stack = self.stack value;

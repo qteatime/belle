@@ -1,7 +1,7 @@
 {
   "name": "belle",
   "target": "*",
-  "native_sources": [],
+  "native_sources": ["native/native.js"],
   "sources": [
     "source/extensions.crochet",
     "grammar/belle.lingua",
@@ -18,8 +18,7 @@
     "crochet.core",
     "crochet.text.parsing.lingua",
     "crochet.debug",
-    "crochet.novella",
-    "crochet.wrapper.node.io"
+    "crochet.novella"
   ],
   "capabilities": {
     "requires": [],

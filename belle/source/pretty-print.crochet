@@ -69,7 +69,7 @@ command debug-representation of: (VM is vm) do
 end
 
 command debug-representation of: (V is value) =
-  debug-representation of: V to-output;
+  debug-representation of: V to-pretty-output;
 
 command debug-representation of: (R is native-rewrite-rule) =
   debug-representation type: "native-rewrite-rule"

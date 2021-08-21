@@ -1,11 +1,11 @@
 % crochet
 
-command (A is b-integer) + (B is b-integer) = new b-integer(A + B);
-command (A is b-integer) - (B is b-integer) = new b-integer(A - B);
-command (A is b-integer) / (B is b-integer) = new b-integer(A divided-by: B);
-command (A is b-integer) % (B is b-integer) = new b-integer(A % B);
-command (A is b-integer) * (B is b-integer) = new b-integer(A * B);
-command (A is b-integer) ** (B is b-integer) = new b-integer(A ** B);
+command (A is b-integer) + (B is b-integer) = new b-integer(A.value + B.value);
+command (A is b-integer) - (B is b-integer) = new b-integer(A.value - B.value);
+command (A is b-integer) / (B is b-integer) = new b-integer(A.value divided-by: B.value);
+command (A is b-integer) % (B is b-integer) = new b-integer(A.value % B.value);
+command (A is b-integer) * (B is b-integer) = new b-integer(A.value * B.value);
+command (A is b-integer) ** (B is b-integer) = new b-integer(A.value ** B.value);
 
 implement equality for value;
 command (A is value) === (B is value) = A =:= B;
@@ -17,12 +17,17 @@ implement total-ordering for b-integer;
 command (A is b-integer) < (B is b-integer) = A.value < B.value;
 command (A is b-integer) > (B is b-integer) = A.value > B.value;
 
+command (A is b-atom) and (B is b-atom) = ((A as boolean) and (B as boolean)) as b-atom;
+command (A is b-atom) or (B is b-atom) = ((A as boolean) or (B as boolean)) as b-atom;
+command not (A is b-atom) = (not (A as boolean)) as b-atom;
+
 command b-stream head = self.value first;
 command b-stream tail = self.value rest;
 command b-stream prepend: Value = new b-stream(self.value prepend: Value);
 command b-stream append: Value = new b-stream(self.value append: Value);
 command b-stream ++ (That is b-stream) = new b-stream(self.value ++ That.value);
 command b-stream last = (self as list) last;
+command b-stream reverse = new b-stream((self as list) reverse as stream);
 command b-stream as list = self.value as list;
 
 command true as b-atom = new b-atom("true");
@@ -41,6 +46,7 @@ command b-stream to-output =
 command b-atom to-output = "#[self.name]";
 command b-form to-output = self.form to-output;
 command b-procedure to-output = "<procedure>";
+command b-block to-output = "\[[self.forms map: (_ to-output) |> _ as interpolation]\]";
 
 command form--rule to-output = "<rule>";
 command form--variable to-output = "%[self.name]";
@@ -51,6 +57,22 @@ command form--block to-output = "\[[self.expressions map: (_ to-output) | flatte
 command form--text to-output = self.contents;
 command native-value-form to-output = self.value to-output;
 
+command value to-pretty-output = self to-output;
+command b-stream to-pretty-output =
+  self.value
+  |> _ as list
+  |> _ map: (_ to-output)
+  |> _ intersperse: ", "
+  |> _ prepend: "\["
+  |> _ append: "\]"
+  |> _ as interpolation;
+
 command b-integer as text = self.value to-text;
 command b-string as text = self.value;
 command b-atom as text = self.name;
+
+command b-atom as boolean =
+  condition
+    when self.name === "true" => true;
+    when self.name === "false" => false;
+  end;
