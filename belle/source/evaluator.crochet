@@ -1,0 +1,156 @@
+% crochet
+
+local enum step-result = sr-done, sr-continue;
+
+// -- Evaluating
+command vm run-to-completion do
+  let Result = self step;
+  condition
+    when Result is sr-done => self;
+    when Result is sr-continue => self run-to-completion;
+  end
+end
+
+command vm step do
+  let Program = self.program value;
+  condition
+    when Program is-empty => sr-done;
+    always do
+      self.program <- Program rest;
+      self evaluate: Program first;
+      sr-continue;
+    end
+  end
+end
+
+
+command vm evaluate: (X is form--rule) do
+  self.rules <- self.rules value append: (X as rewrite-rule);
+end
+
+command vm evaluate: (X is form--variable) do
+  self push-on-stack: self at: X.name;
+end
+
+command vm evaluate: (X is form--number) do
+  let Value = #integer try-parse: X.digits
+                | value-or-panic: "internal: invalid integer";
+  self push-on-stack: new b-integer(Value);
+end
+
+command vm evaluate: (X is form--atom) do
+  self push-on-stack: new b-atom(X.contents);
+end
+
+command vm evaluate: (X is form--string) do
+  self push-on-stack: new b-string(X.contents);
+end
+
+command vm evaluate: (X is form--block) do
+  self push-on-stack: new b-block(X);
+end
+
+command vm evaluate: (X is form--text) do
+  self rewrite: X.contents;
+end
+
+
+// -- Stack and application
+command vm push-on-stack: Value do
+  let Stack = self.stack value;
+  condition
+    when Stack is-empty do
+      self.stack <- [Value];
+    end
+
+    when Stack first is b-procedure do
+      let Function = Stack first; 
+      self.stack <- Stack rest;
+      self apply: Function to: Value;
+    end
+
+    always do
+      self.stack <- Stack prepend: Value;
+    end
+  end
+end
+
+command vm apply: (Function is b-procedure) to: Value do
+  let Captured = Function.captured append: Value;
+  condition
+    when Captured count === Function.arity do
+      self.stack <- Captured ++ self.stack value;
+      self run-function: Function;
+    end
+
+    always do
+      self.stack <- self.stack value prepend: Function update-capture: Captured;
+    end
+  end
+end
+
+command vm run-runction: (Fun is b-lambda) do
+  self.program <- Fun.body ++ self.program value;
+end
+
+command vm run-function: (Fun is b-native-lambda) do
+  Fun.run(self);
+end
+
+
+// -- Rewriting
+command vm rewrite: (Word is text) do
+  let Match = self.rules value find-first: (self rule: _ applies-to: Word);
+  condition
+    when Match is error => self;
+    when Match is ok do
+      let Rule = Match value;
+      self apply-rewrite-rule: Rule;
+    end
+  end
+end
+
+command vm apply-rewrite-rule: (Rule is user-rewrite-rule) do
+  condition
+    when Rule is-immediate do
+      self.program <- Rule.form.replacement ++ self.program value;
+    end
+
+    always do
+      self push-on-stack: new b-lambda(Rule arity, [], Rule.form.replacement);
+    end
+  end
+end
+
+command vm apply-rewrite-rule: (Rule is native-rewrite-rule) do
+  condition
+    when Rule is-immediate => Rule.run(self);
+    always => self push-on-stack: new b-native-lambda(Rule arity, [], Rule.run);
+  end
+end
+
+
+command vm rule: (Rule is rewrite-rule) applies-to: (Word is text) do
+  Rule pattern applies-to: Word;
+end
+
+
+command pattern--word applies-to: (Word is text) do
+  self.word === Word;
+end
+
+
+command form--rule arity =
+  #integer try-parse: self.arity
+    | value-or-panic: "internal: invalid integer";
+
+command user-rewrite-rule arity = self.arity;
+command native-rewrite-rule arity = self.arity;
+
+command user-rewrite-rule pattern = self.form.pattern;
+command native-rewrite-rule pattern = self.pattern;
+
+command rewrite-rule is-immediate = self arity === 0;
+
+command form--rule as rewrite-rule =
+  new user-rewrite-rule(self arity, self);

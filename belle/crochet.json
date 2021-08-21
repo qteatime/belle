@@ -1,0 +1,26 @@
+{
+  "name": "belle",
+  "target": "*",
+  "native_sources": [],
+  "sources": [
+    "source/extensions.crochet",
+    "grammar/belle.lingua",
+    "source/0-types.crochet",
+    "source/parser.crochet",
+    "source/pretty-print.crochet",
+    "source/evaluator.crochet",
+    "source/bootstrap.crochet",
+    "source/main.crochet"
+  ],
+  "dependencies": [
+    "crochet.core",
+    "crochet.text.parsing.lingua",
+    "crochet.debug",
+    "crochet.novella",
+    "crochet.wrapper.node.io"
+  ],
+  "capabilities": {
+    "requires": [],
+    "provides": []
+  }
+}

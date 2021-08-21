@@ -1,0 +1,24 @@
+% crochet
+
+open crochet.wrapper.node.io;
+
+local singleton app;
+
+command main: (Args is list) do
+  condition
+    when Args first === "parse" => app show-ast: (Args at: 2);
+    when Args first === "run" => app run: (Args at: 2);
+  end
+end
+
+command app run: Source do
+  let Program = belle parse: Source;
+  let VM = belle make-vm: Program;
+  let Result = VM run-to-completion;
+  Result;
+end
+
+command app show-ast: Source do
+  let Program = belle parse: Source;
+  terminal write-line: (belle pretty-print: Program);
+end

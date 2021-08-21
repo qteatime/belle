@@ -1,0 +1,17 @@
+: rule Why/0 = @copy @cons @self @program
+               @vertical-align #bottom @flex-row #2
+               @image "hello-world.png"
+               @box
+               @display @typeset title @drop-last #1 @last
+               @display @typeset prose @top.
+
+Why! cried Alice,
+The white rabbit stopped, stared, startled,
+A rabbit carrying a clock, that I had never seen!
+The rabbit took his pocket watch,
+Looked at it for a moment,
+It is getting late, I must make haste,
+He sprung forth and entered a small hole in a tree,
+My! And it gets curiouser still!
+Left alone, Alice wondered,
+Would she get his attention by starting with a "Hello?"

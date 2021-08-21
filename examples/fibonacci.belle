@@ -1,0 +1,23 @@
+: rule Round = @copy-program.
+
+: rule An spiral = @iterate @cons #1 @cons #1 #1 [@set %x @top
+                                                  @set %a @head %x
+                                                  @set %xs @tail %x
+                                                  @set %r @mul %a @head @tail %xs
+                                                  @cons %r @cons %r %xs].
+
+: rule A spiral = @pack-tile-display
+                  @map [@set %x @top @size %x %x @box]
+                  @reverse
+                  @take 20
+                  @map @first @top
+                  @display @top.
+
+Round,
+Well, not quite,
+Not quite much as a circle, at least,
+Or an ellipsis,
+Not anything so ordinary,
+An spiral?
+Yes,
+A spiral.

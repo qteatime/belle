@@ -1,0 +1,54 @@
+% crochet
+
+command debug-representation of: (X is program) =
+  debug-representation type: "program"
+    | value: X.forms
+    | finish;
+
+command debug-representation of: (X is pattern--word) =
+  debug-representation type: "pattern.word"
+    | value: X.word
+    | finish;
+
+command debug-representation of: (X is form--variable) =
+  debug-representation type: "variable"
+    | value: X.name
+    | finish;
+
+command debug-representation of: (X is form--number) =
+  debug-representation type: "number"
+    | value: X.digits
+    | finish;
+
+command debug-representation of: (X is form--atom) =
+  debug-representation type: "atom"
+    | value: X.contents
+    | finish;
+
+command debug-representation of: (X is form--string) =
+  debug-representation type: "string"
+    | value: X.contents
+    | finish;
+
+command debug-representation of: (X is form--text) =
+  debug-representation type: "text"
+    | value: X.contents
+    | finish;
+
+command debug-representation of: (X is form--block) =
+  debug-representation type: "block"
+    | value: X.expressions
+    | finish;
+
+command debug-representation of: (X is form--rule) =
+  debug-representation type: "rule"
+    | field: "arity" value: X.arity
+    | field: "pattern" value: X.pattern
+    | field: "replacement" value: X.replacement
+    | finish;
+
+command belle pretty-print: (X is program) do
+  let Printer = new debug-printer;
+  Printer show: X;
+end
+  
