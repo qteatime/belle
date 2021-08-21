@@ -1,0 +1,35 @@
+% crochet
+
+local abstract page;
+local singleton page-start is page;
+
+local type ide(page is page, history is cell<list<page>>);
+
+command #ide make = new ide(page-start, #cell with-value: []);
+
+command belle start-ide-with-root: Root do
+  let Ide = #ide make;
+  belle with-html-root: Root do: {
+    Ide show: Ide.page;
+  };
+end
+
+command ide show: (Page is page) do
+  perform html.render(Page render);
+end
+
+command page-start render do
+  h page: "start-page" | add: [
+    h column add: [
+      h top-menu,
+      h main-panel add: [
+        h title: "Belle",
+        h paragraph add: [
+          "Belle is a programming language entirely dedicated to
+           the literary aesthetics of programs. Fiddle around with
+           how to express a program before giving it any meaning."
+        ],
+      ],
+    ],
+  ];
+end
