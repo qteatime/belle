@@ -59,11 +59,8 @@ command h column =
 command h row =
   h box class: "belle-row";
 
-command h top-menu =
-  h box class: "belle-top-menu";
-
-command h main-panel =
-  h box class: "belle-main-panel";
+command h panel =
+  h box class: "belle-panel";
 
 command h title: Title =
   h element: "h1"
@@ -85,3 +82,9 @@ command h program-button =
 command h icon: (Name is text) =
   h element: "i"
     | class: "belle-icon fas [Name]";
+
+command h link =
+  h element: "a";
+
+command h menu-link: Content =
+  h link | class: "menu-link" | add: [Content];

@@ -29,6 +29,7 @@ end
 
 command vm evaluate: (X is form--rule) do
   self.rules <- self.rules value append: (X as rewrite-rule);
+  self sort-rules;
 end
 
 command vm evaluate: (X is form--variable) do
@@ -61,6 +62,8 @@ command vm evaluate: (X is native-value-form) do
   self push-on-stack: X.value;
 end
 
+command vm evaluate: form--matched = self push-on-stack: new b-string("^self");
+command vm evaluate: form--remaining = self push-on-stack: new b-string("^program");
 
 // -- Stack and application
 command vm push-on-stack: (Value is b-procedure) do
@@ -103,7 +106,7 @@ command vm apply: (Function is b-procedure) to: Value do
   end
 end
 
-command vm run-runction: (Fun is b-lambda) do
+command vm run-function: (Fun is b-lambda) do
   self.program <- Fun.body ++ self.program value;
 end
 
@@ -180,6 +183,10 @@ command native-word-pattern applies-to: (Word is text) do
   self.word === Word;
 end
 
+command pattern--anything applies-to: _ do
+  true;
+end
+
 
 command form--rule arity =
   #integer try-parse: self.arity
@@ -195,3 +202,15 @@ command rewrite-rule is-immediate = self arity === 0;
 
 command form--rule as rewrite-rule =
   new user-rewrite-rule(self arity, self);
+
+
+command native-word-pattern distance = 0;
+command pattern--word distance = 0;
+command pattern--anything distance = 1;
+
+command rewrite-rule distance = self pattern distance;
+
+command vm sort-rules do
+  self.rules <- self.rules value sort-by: { A, B in A distance compare-to: B distance };
+  self;
+end

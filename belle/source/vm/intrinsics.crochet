@@ -47,6 +47,7 @@ command b-atom to-output = "#[self.name]";
 command b-form to-output = self.form to-output;
 command b-procedure to-output = "<procedure>";
 command b-block to-output = "\[[self.forms map: (_ to-output) |> _ as interpolation]\]";
+command b-box to-output = "<box>";
 
 command form--rule to-output = "<rule>";
 command form--variable to-output = "%[self.name]";

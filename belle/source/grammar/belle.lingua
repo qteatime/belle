@@ -2,6 +2,7 @@ type program(info: interval, forms: list<form>)
 
 type pattern =
   | word(info: interval, word: text)
+  | anything(info: interval)
 
 type form =
   | rule(info: interval, arity: text, pattern: pattern, replacement: list<expression>)
@@ -19,21 +20,24 @@ grammar Belle : program {
     | xs:form* end -> program(meta, xs)
 
   form =
-    | ":" s x:special_form                                              -> x
+    | x:special_form                                                    -> x
     | e:expr                                                            -> e
     | t:text_piece                                                      -> t
+    | x:any                                                             -> form.text(meta, x)
 
   text_piece =
+    | "\\" x:any                                                        -> form.text(meta, x)
     | w:word                                                            -> form.text(meta, w)
     | p:punctuation                                                     -> form.text(meta, p)
     | s:horizontal_spaces                                               -> form.text(meta, s)
     | n:newline                                                         -> form.text(meta, n)
 
   special_form =
-    | id<"rule"> p:ws<pattern> ws<"/"> a:ws<number> ws<"="> e:ws<expr_block> ws<"."> ws<newline>  -> form.rule(meta, a, p, e)
+    | id<":rule"> p:ws<pattern> ws<"/"> a:ws<number> ws<"="> e:ws<expr_block> ws<"."> ws<newline>  -> form.rule(meta, a, p, e)
 
   pattern =
-    | w:word -> pattern.word(meta, w)
+    | id<"<any>">  -> pattern.anything(meta)
+    | w:word       -> pattern.word(meta, w)
 
   expr =
     | "%" w:word                -> form.variable(meta, w)
@@ -59,6 +63,7 @@ grammar Belle : program {
     | "\"" x:string_chars "\"" -> x
   
   token string_chars =
+    | "\\" any
     | (~"\"" any)*
 
   token newline =

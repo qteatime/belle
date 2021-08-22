@@ -1,0 +1,50 @@
+:rule <any>/0 = @display ^self.
+:rule tt/1 = @set #x @dip
+             @mono @display %x @pop.
+
+@box
+  @typeset #documentation
+
+@subtitle #Introduction
+
+@paragraph
+Belle is a term rewriting system that uses the
+entire program as input, and applies any defined
+rewrite rules to give this input some semantics.
+@pop
+
+@paragraph
+A rewrite rule is defined by specifying a matching
+pattern, an arity, and its replacements:
+@pop
+
+    @code @display
+    [:rule Hello = @display @join ""
+                                  @reverse @letters ^self. ]
+    @pop
+
+@paragraph
+The rule 'Hello' above would match any 'Hello'
+word and replace it with the reversed form of
+itself: 'olleH'.
+@pop
+
+@paragraph
+Programs are executed by taking in a program,
+applying any possible rewrite rules at that point,
+and then repeating the process. A rewrite rule
+has as special inputs the remaining of the program,
+or @tt "\^program", and the matched input, or @tt "^self".
+@pop
+
+
+@subtitle "Primitives"
+
+@paragraph
+A Belle program is executed in an environment
+that contains pre-defined `primitive` rules.
+By convention, primitive operations start with
+a `@`, although there's nothing that prevents
+user-defined rules from doing the same.
+@pop
+

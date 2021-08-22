@@ -1,11 +1,17 @@
 #crochet-container .belle-title {
   text-align: center;
   font-family: "Parisienne", serif;
-  font-size: 2em;
+  font-size: 3em;
 }
 
 #crochet-container .start-page .belle-title {
   font-size: 5em;
+}
+
+#crochet-container .belle-subtitle {
+  font-family: "Parisienne", serif;
+  font-size: 2em;
+  margin-top: 0.5em;
 }
 
 #crochet-container .start-description {
@@ -50,9 +56,64 @@
   align-items: center;
   margin: 1em;
   width: 25%;
+  text-align: center;
+  font-size: 0.85em;
+  font-family: sans-serif;
 }
 
 #crochet-container .belle-output {
   font-size: 1.2em;
   white-space: pre-line;
+}
+
+#crochet-container .documentation {
+  white-space: normal;
+}
+
+#crochet-container .belle-paragraph {
+  margin-bottom: 1.5em;
+}
+
+#crochet-container .belle-typewriter {
+  font-family: monospace;
+}
+
+#crochet-container .belle-code {
+  margin: 0 0.5em 1.5em 0.5em;
+  padding: 0.5em;
+  border: 1px solid #ececea;
+  display: block;
+  white-space: pre-wrap;
+}
+
+#crochet-container .menu-link {
+  font-size: 1.2em;
+  font-family: sans-serif;
+  display: inline-block;
+  height: 48px;
+  line-height: 48px;
+  padding: 0 1em;
+  cursor: pointer;
+  font-weight: bold;
+  color: #3c6382;
+  border-bottom: 2px solid #ececea;
+  position: relative;
+  top: 2px;
+}
+
+#crochet-container .menu-link:hover {
+  border-bottom-color: #3c6382;
+}
+
+#crochet-container .navigation {
+  margin-bottom: 1.5em;
+  border-bottom: 2px solid #ececea;
+}
+
+#crochet-container {
+  padding: 0 2em;
+}
+
+#crochet::after {
+  display: none;
 }

@@ -58,7 +58,7 @@ command page-start render do
   h page: "start-page" | add: [
     h column add: [
       h top-menu,
-      h main-panel add: [
+      h panel | class: "belle-main-panel" | add: [
         h title: "Belle",
         h paragraph | class: "start-description" | add: [
           "Can programming be seen as literary art?
@@ -71,7 +71,7 @@ command page-start render do
 
         h box | class: "start-program-selection" | add: [
           h column | class: "belle-program-column" | add: [
-            h program-button | on: "click" do: (module new-program: _) | add: [
+            h program-button | on: "click" do: { _ in module new-program } | add: [
               h icon: "fa-plus" | title: "Create a new program",
             ],
             "New program",
@@ -99,28 +99,67 @@ end
 
 command page-run render do
   let Output = h box | class: "belle-output";
+  let Stack = #cell with-value: [];
+  let Current = #cell with-value: Output;
   handle
     let Ast = belle parse: self.program.text;
     let VM = belle make-vm: Ast;
     VM run-to-completion;
   with
     on belle.display(Value) do
-      Output add: Value to-output;
+      Current value add: Value to-output;
       continue with nothing;
+    end
+
+    on belle.push-element(Tag) do
+      let New = h element: Tag;
+      Current value add: New;
+      Stack <- Stack value prepend: Current value;
+      Current <- New;
+      continue with nothing;
+    end
+
+    on belle.pop-element() do
+      let Xs = Stack value;
+      Stack <- Xs rest;
+      Current <- Xs first;
+      continue with nothing;
+    end
+
+    on belle.current-element() do
+      continue with new b-box(Current value);
     end
   end
 
   h page: "run-page" | add: [
     h column add: [
       h top-menu,
-      h box | class: "belle-run-panel" | add: [
+      h panel | class: "belle-run-panel" | add: [
         Output
       ],
     ],
   ];
 end
 
-command module new-program: _ do
+command h top-menu: Contents do
+  h box | class: "navigation" | add: [
+    h box | class: "navigation-left" | add: [
+      h menu-link: "Home"
+        | on: "click" do: { _ in module show-start-page },
+    ],
+    h box | class: "navigation-right" | add: [
+      Contents,
+    ],
+  ];
+end
+
+command h top-menu = h top-menu: [];
+
+command module show-start-page do
+  module show: page-start;
+end
+
+command module new-program do
   let Program = new belle-program("Untitled", "");
   module show: new page-edit(#cell with-value: Program);
 end
@@ -152,9 +191,9 @@ define sample-programs = [
 
   new belle-program(
     "Fibonacci Spiral",
-    ": rule Round/0 = @set #program @cons ^self ^rest.
+    ":rule Round/0 = @set #program @cons ^self ^rest.
 
-      : rule An/0 = @set #a #1
+      :rule An/0 = @set #a #1
                     @set #b #1
                     @set #n #20
                     @set #fib @cons %a @cons %b @nil
@@ -166,7 +205,7 @@ define sample-programs = [
                               @if @eq %n #0 \[%fib\] \[@apply %f\]\]
                     @apply %f.
 
-      : rule A/0 = @display %program
+      :rule A/0 = @display %program
                    @line-break
                    @display @pretty-print @reverse %fib.
 
@@ -180,4 +219,62 @@ define sample-programs = [
       A spiral.
     ",
   ),
+
+  new belle-program(
+"Documentation",
+"
+:rule <any>/0 = @display ^self.
+:rule @tt/1 = @set #x @dip
+              @inspect #tt %x
+              @push #tt
+              @typeset #belle-typewriter
+              @display %x
+              @pop.
+
+@box
+  @typeset #documentation
+
+@subtitle \"Introduction\"
+
+@paragraph
+Belle is a term rewriting system that uses the
+entire program as input, and applies any defined
+rewrite rules to give this input some semantics.
+@pop
+
+@paragraph
+A rewrite rule is defined by specifying a matching
+pattern, an arity, and its replacements:
+@pop
+
+@code @display
+\":rule Hello = @display @join @reverse @letters ^self.\"
+@pop
+
+@paragraph
+The rule 'Hello' above would match any 'Hello'
+word and replace it with the reversed form of
+itself: 'olleH'.
+@pop
+
+@paragraph
+Programs are executed by taking in a program,
+applying any possible rewrite rules at that point,
+and then repeating the process. A rewrite rule
+has as special inputs the remaining of the program,
+or @tt \"^program\", and the matched input, or @tt \"^self\".
+@pop
+
+
+@subtitle \"Primitives\"
+
+@paragraph
+A Belle program is executed in an environment
+that contains pre-defined primitive rules.
+By convention, primitive operations start with
+a '@', although there's nothing that prevents
+user-defined rules from doing the same.
+@pop
+",
+  )
 ];

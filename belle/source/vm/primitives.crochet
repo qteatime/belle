@@ -270,4 +270,57 @@ command vm add-primitive-rules do
         let Value = VM pop-stack;
         transcript inspect: Value tag: Tag;
       }
+
+    // HTML display functions
+    | rewrite: "@push" arity: 1 with: { VM, _ in
+        let Tag = VM pop-stack as text;
+        perform belle.push-element(Tag);
+      }
+
+    | rewrite: "@set-attribute" arity: 2 with: { VM, _ in
+        let Element = perform belle.current-element();
+        let Name = VM pop-stack as text;
+        let Value = VM pop-stack as text;
+        Element.box set-attribute: Name to: Value;
+      }
+
+    | rewrite: "@pop" arity: 0 with: { VM, _ in
+        perform belle.pop-element();
+      }    
 end
+
+command vm add-prelude do
+  let Prelude = belle parse: belle-prelude;
+  let Rules = Prelude.forms
+                | keep-if: { X in X is form--rule }
+                | map: (_ as rewrite-rule);
+  self.rules <- Rules ++ self.rules value;
+  self;
+end
+
+define belle-prelude = "
+:rule @box/0 = @push #div.
+
+:rule @typeset/1 = @set #class @dip
+                   @set-attribute #class %class.
+
+:rule @mono/0 = @box @typeset #belle-monospaced.
+
+:rule @title/1 = @set #title @dip
+                 @push #h1
+                 @typeset #belle-title
+                 @display %title
+                 @pop.
+
+:rule @subtitle/1 = @set #title @dip
+                    @push #h2
+                    @typeset #belle-subtitle
+                    @display %title
+                    @pop.
+
+:rule @code/0 = @push #code
+                @typeset #belle-code.
+
+:rule @paragraph/0 = @push #p
+                     @typeset #belle-paragraph.
+";

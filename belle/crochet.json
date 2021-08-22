@@ -19,8 +19,7 @@
   "dependencies": [
     "crochet.core",
     "crochet.text.parsing.lingua",
-    "crochet.debug",
-    "crochet.novella"
+    "crochet.debug"
   ],
   "capabilities": {
     "requires": [],

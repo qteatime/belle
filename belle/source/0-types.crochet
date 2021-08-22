@@ -13,6 +13,7 @@ type b-block(forms is list<form>) is value;
 abstract b-procedure is value;
 type b-lambda(arity is integer, captured is list<value>, body is list<form>) is b-procedure;
 type b-native-lambda(arity is integer, matched is text, captured is list<value>, run is ((vm, text) -> vm)) is b-procedure;
+type b-box(box) is value;
 
 // -- The rewriting
 type native-value-form(value is value) is form;
@@ -31,4 +32,7 @@ type vm(bindings is cell<map<text, value>>,
 // -- Execution effects
 effect belle with
   display(value);
+  push-element(tag);
+  pop-element();
+  current-element();
 end
