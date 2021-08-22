@@ -63,7 +63,7 @@ command vm evaluate: (X is native-value-form) do
 end
 
 command vm evaluate: form--matched = self push-on-stack: new b-string("^self");
-command vm evaluate: form--remaining = self push-on-stack: new b-string("^program");
+command vm evaluate: form--remaining = self push-on-stack: new b-string("^rest");
 
 // -- Stack and application
 command vm push-on-stack: (Value is b-procedure) do

@@ -25,6 +25,7 @@
   display: flex;
   align-content: center;
   justify-content: center;
+  flex-wrap: wrap;
 }
 
 #crochet-container .belle-program-button {
@@ -122,7 +123,7 @@
 }
 
 #crochet-container {
-  padding: 0 2em;
+  padding: 0 2em 2em 2em;
 }
 
 #crochet::after {
@@ -181,4 +182,18 @@
   border-bottom: 1px solid var(--primary);
   font-family: "Parisienne", serif;
   outline: none;
+}
+
+#crochet-container .documentation-reference {
+  border-bottom: 1px solid #ececea;
+  padding: 0.5em 0 1em;
+  margin-bottom: 1.5em;
+  white-space: normal;
+}
+
+#crochet-container .documentation-reference-title {
+  font-weight: bold;
+  border-left: 4px solid var(--primary);
+  padding-left: 0.5em;
+  margin-bottom: 0.8em;
 }

@@ -323,4 +323,10 @@ define belle-prelude = "
 
 :rule @paragraph/0 = @push #p
                      @typeset #belle-paragraph.
+
+:rule @collapse-spaces = @box @typeset #documentation.
+
+:rule @list/0 = @push #ul.
+:rule @item/0 = @push #li.
+:rule @bold/0 = @push #b.
 ";

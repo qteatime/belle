@@ -15,6 +15,8 @@ type form =
   | remaining(info: interval)
   | text(info: interval, contents: text)
 
+type pair(first: any, second: any)
+
 grammar Belle : program {
   program =
     | xs:form* end -> program(meta, xs)
@@ -26,28 +28,34 @@ grammar Belle : program {
     | x:any                                                             -> form.text(meta, x)
 
   text_piece =
-    | "\\" x:any                                                        -> form.text(meta, x)
-    | w:word                                                            -> form.text(meta, w)
-    | p:punctuation                                                     -> form.text(meta, p)
+    | basic_text_piece
     | s:horizontal_spaces                                               -> form.text(meta, s)
     | n:newline                                                         -> form.text(meta, n)
 
+  basic_text_piece =
+    | "\\" x:any                                                        -> form.text(meta, x)
+    | w:word                                                            -> form.text(meta, w)
+    | p:punctuation                                                     -> form.text(meta, p)
+
   special_form =
-    | id<":rule"> p:ws<pattern> ws<"/"> a:ws<number> ws<"="> e:ws<expr_block> ws<"."> ws<newline>  -> form.rule(meta, a, p, e)
+    | id<":rule"> p:ws<rule_pattern> ws<"="> e:ws<expr_block> space* "." s newline -> form.rule(meta, p.second, p.first, e)
+
+  rule_pattern =
+    | p:pattern space* "/" space* a:number -> pair(p, a)
 
   pattern =
     | id<"<any>">  -> pattern.anything(meta)
     | w:word       -> pattern.word(meta, w)
 
   expr =
-    | "%" w:word                -> form.variable(meta, w)
-    | "#" n:number              -> form.number(meta, n)
-    | "#" w:word                -> form.atom(meta, w)
-    | s:string                  -> form.string(meta, s)
-    | id<"^rest">               -> form.remaining(meta)
-    | id<"^self">               -> form.matched(meta)
-    | ~"." t:text_piece         -> t
-    | "[" s e:expr_block s "]"  -> form.block(meta, e)
+    | "%" w:word                          -> form.variable(meta, w)
+    | "#" n:number                        -> form.number(meta, n)
+    | "#" w:word                          -> form.atom(meta, w)
+    | s:string                            -> form.string(meta, s)
+    | id<"^rest">                         -> form.remaining(meta)
+    | id<"^self">                         -> form.matched(meta)
+    | ~"." t:basic_text_piece             -> t
+    | "[" space* e:expr_block space* "]"  -> form.block(meta, e)
   
   expr_block =
     | listOf<expr, space+>
@@ -83,5 +91,5 @@ grammar Belle : program {
     | "." | "," | "!" | "?" | "," | ";" | "(" | ")" | "-"
 
   id<word> = x:word ~(letter | digit | "-" | "_") -> x
-  ws<pattern> = s x:pattern -> x
+  ws<pattern> = space+ x:pattern -> x
 }

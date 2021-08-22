@@ -1,9 +1,7 @@
-: rule Why/0 = @copy @cons ^ @program
-               @vertical-align #bottom @flex-row #2
-               @image "hello-world.png"
-               @box
-               @display @typeset title @drop-last #1 @last
-               @display @typeset prose @top.
+:rule Why/0 =
+  @set #program @cons ^self ^rest
+  @title @last %program
+  @display %program.
 
 Why! cried Alice,
 The white rabbit stopped, stared, startled,
