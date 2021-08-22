@@ -102,11 +102,9 @@ command page-run render do
   handle
     let Ast = belle parse: self.program.text;
     let VM = belle make-vm: Ast;
-    transcript inspect: VM run-to-completion;
+    VM run-to-completion;
   with
     on belle.display(Value) do
-      foreign belle.debugger();
-      transcript inspect: Value;
       Output add: Value to-output;
     end
   end
