@@ -51,3 +51,8 @@
   margin: 1em;
   width: 25%;
 }
+
+#crochet-container .belle-output {
+  font-size: 1.2em;
+  white-space: pre-line;
+}

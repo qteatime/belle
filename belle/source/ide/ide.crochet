@@ -106,6 +106,7 @@ command page-run render do
   with
     on belle.display(Value) do
       Output add: Value to-output;
+      continue with nothing;
     end
   end
 
@@ -132,9 +133,10 @@ define sample-programs = [
   new belle-program(
     "Hello, world",
     ":rule Why/0 = @set #program @cons ^self ^rest
-                    @display @last %program
-                    @line-break @line-break
-                    @display %program.
+                   @inspect #last-program @last %program
+                   @display @last %program
+                   @line-break @line-break
+                   @display %program.
 
       Why! cried Alice,
       The white rabbit stopped, stared, startled,
@@ -145,8 +147,7 @@ define sample-programs = [
       He sprung forth and entered a small hole in a tree,
       My! And it gets curiouser still!
       Left alone, Alice wondered,
-      Would she get his attention by starting with a \"Hello?\"
-    ",
+      Would she get his attention by starting with a \"Hello?\"",
   ),
 
   new belle-program(

@@ -264,4 +264,10 @@ command vm add-primitive-rules do
     | rewrite: "@line-break" arity: 0 with: { VM, _ in
         perform belle.display(new b-string("\n"));
       }
+
+    | rewrite: "@inspect" arity: 2 with: { VM, _ in
+        let Tag = VM pop-stack as text;
+        let Value = VM pop-stack;
+        transcript inspect: Value tag: Tag;
+      }
 end
