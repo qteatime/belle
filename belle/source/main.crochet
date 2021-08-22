@@ -15,9 +15,13 @@ command main-html: Root do
 end
 
 command app run: Source do
-  let Program = belle parse: Source;
-  let VM = belle make-vm: Program;
-  let Result = VM run-to-completion;
+  handle
+    let Program = belle parse: Source;
+    let VM = belle make-vm: Program;
+    let Result = VM run-to-completion;
+  with
+    on belle.display(Value) => transcript write: Value to-output;
+  end
   nothing;
 end
 

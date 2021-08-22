@@ -27,3 +27,8 @@ type vm(bindings is cell<map<text, value>>,
         stack is cell<list<value>>,
         program is cell<list<form>>,
         rules is cell<list<rewrite-rule>>);
+
+// -- Execution effects
+effect belle with
+  display(value);
+end

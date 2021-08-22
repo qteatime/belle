@@ -23,6 +23,12 @@ exports.default = (ffi) => {
     return box;
   });
 
+  ffi.defun("belle.clean", (box) => {
+    const element = ffi.unbox(box);
+    element.innerHTML = "";
+    return box;
+  });
+
   ffi.defun("belle.set-attribute", (box, name, value) => {
     ffi
       .unbox(box)
@@ -32,5 +38,23 @@ exports.default = (ffi) => {
 
   ffi.defun("belle.get-attribute", (box, name) => {
     return ffi.text(ffi.unbox(box).getAttribute(ffi.text_to_string(name)));
+  });
+
+  ffi.defun("belle.add-listener", (box, event, handler) => {
+    ffi.unbox(box).addEventListener(ffi.text_to_string(event), (event) => {
+      function* machine() {
+        yield ffi.apply(handler, [ffi.box(event)]);
+        return ffi.nothing;
+      }
+      ffi.run_asynchronously(machine).catch((error) => {
+        console.error(error);
+      });
+    });
+    return box;
+  });
+
+  ffi.defun("belle.debugger", () => {
+    debugger;
+    return ffi.nothing;
   });
 };

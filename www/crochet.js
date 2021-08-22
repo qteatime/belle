@@ -2435,6 +2435,10 @@ class ForeignInterface {
         const env = new vm_1.Environment(null, null, __classPrivateFieldGet(this, _ForeignInterface_module, "f"), null);
         return vm_1.run_native_sync(__classPrivateFieldGet(this, _ForeignInterface_universe, "f"), env, __classPrivateFieldGet(this, _ForeignInterface_package, "f"), fn());
     }
+    run_asynchronously(fn) {
+        const env = new vm_1.Environment(null, null, __classPrivateFieldGet(this, _ForeignInterface_module, "f"), null);
+        return vm_1.run_native(__classPrivateFieldGet(this, _ForeignInterface_universe, "f"), env, __classPrivateFieldGet(this, _ForeignInterface_package, "f"), fn());
+    }
     // == Destructors
     integer_to_bigint(x) {
         vm_1.Values.assert_tag(vm_1.Tag.INTEGER, x);

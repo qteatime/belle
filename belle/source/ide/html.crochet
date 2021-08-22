@@ -2,18 +2,7 @@
 
 singleton h;
 local type element(box);
-
-effect html with
-  render(Element);
-end
-
-command belle with-html-root: Element do: (Block is (() -> B)) do
-  handle
-    Block();
-  with
-    on html.render(X) => foreign belle.append(Element, X.box);
-  end
-end
+local type html-event(box);
 
 
 command h element: (Tag is text) = new element(foreign belle.box(Tag));
@@ -51,25 +40,30 @@ command element set-attribute: Name to: (Value is interpolation) =
 command element attribute: (Name is text) =
   foreign belle.get-attribute(self.box, Name);
 
-command element class: Name = self set-attribute: "class" to: Name;
+command element class: Name = self set-attribute: "class" to: "[self attribute: "class"] [Name]";
+command element set-class: Name = self set-attribute: "class" to: Name;
 command element id: Name = self set-attribute: "id" to: Name;
+command element title: Text = self set-attribute: "title" to: Text;
 
+command element on: (Event is text) do: (Handler is (Event -> B)) do
+  foreign belle.add-listener(self.box, Event, { Ev in Handler(new html-event(Ev)) });
+  self;
+end
 
 command h page: Name =
-  h element: "div"
-    | class: "belle-page [Name]";
+  h box class: "belle-page [Name]";
 
 command h column =
-  h element: "div"
-    | class: "belle-column";
+  h box class: "belle-column";
+
+command h row =
+  h box class: "belle-row";
 
 command h top-menu =
-  h element: "div"
-    | class: "belle-top-menu";
+  h box class: "belle-top-menu";
 
 command h main-panel =
-  h element: "div"
-    | class: "belle-main-panel";
+  h box class: "belle-main-panel";
 
 command h title: Title =
   h element: "h1"
@@ -78,3 +72,16 @@ command h title: Title =
 
 command h paragraph =
   h element: "p";
+
+command h box =
+  h element: "div";
+
+command h button =
+  h element: "button";
+
+command h program-button =
+  h button class: "belle-program-button";
+
+command h icon: (Name is text) =
+  h element: "i"
+    | class: "belle-icon fas [Name]";

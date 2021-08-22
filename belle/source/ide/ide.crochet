@@ -1,21 +1,57 @@
 % crochet
 
+open crochet.debug;
+
+local singleton module;
+
+relation current-ide: Ide root: Root;
+
+local type belle-program(title is text, text is text);
+
 local abstract page;
 local singleton page-start is page;
+local type page-edit(program is cell<belle-program>) is page;
+local type page-run(program is belle-program) is page;
 
-local type ide(page is page, history is cell<list<page>>);
+effect ide with
+  show-page(page);
+end
 
-command #ide make = new ide(page-start, #cell with-value: []);
+local type ide(page is page, history is list<page>);
+
+command #ide make = new ide(page-start, []);
 
 command belle start-ide-with-root: Root do
   let Ide = #ide make;
-  belle with-html-root: Root do: {
-    Ide show: Ide.page;
-  };
+  fact current-ide: Ide root: Root;
+  module show: Ide.page;
 end
 
-command ide show: (Page is page) do
-  perform html.render(Page render);
+command module current-ide do
+  (search current-ide: Ide root: _).Ide first;
+end
+
+command module current-root do
+  (search current-ide: _ root: Root).Root first;
+end
+
+command module update-ide: Ide do
+  fact current-ide: Ide root: (module current-root);
+end
+
+command module show: (Page is page) do
+  let Root = module current-root;
+  foreign belle.clean(Root);
+  foreign belle.append(Root, (Page render).box);
+  let Ide = module current-ide change-page: Page;
+  module update-ide: Ide;
+end
+
+command ide change-page: (Page is page) do
+  condition
+    when Page =:= self.page => new ide(self.page, self.history);
+    always => new ide(Page, self.history prepend: self.page);
+  end
 end
 
 command page-start render do
@@ -24,12 +60,125 @@ command page-start render do
       h top-menu,
       h main-panel add: [
         h title: "Belle",
-        h paragraph add: [
-          "Belle is a programming language entirely dedicated to
-           the literary aesthetics of programs. Fiddle around with
-           how to express a program before giving it any meaning."
+        h paragraph | class: "start-description" | add: [
+          "Can programming be seen as literary art?
+
+           Belle is a small experiment in this space,
+           A tiny push towards programming's own Belles Lettres.
+           Fiddle with the aesthetics of prose and poetry,
+           And give it meaning through rewite rules."
+        ],
+
+        h box | class: "start-program-selection" | add: [
+          h column | class: "belle-program-column" | add: [
+            h program-button | on: "click" do: (module new-program: _) | add: [
+              h icon: "fa-plus" | title: "Create a new program",
+            ],
+            "New program",
+          ],
+
+          sample-programs map: (self render-program-button: _),
         ],
       ],
     ],
   ];
 end
+
+command page-start render-program-button: (Program is belle-program) do
+  h column | class: "belle-program-column" | add: [
+    h program-button | on: "click" do: (module on: _ load-program: Program) | add: [
+      h icon: "fa-play" | title: "Run [Program.title]",
+    ],
+    Program.title,
+  ]
+end
+
+command page-edit render do
+  h box add: ["TODO"];
+end
+
+command page-run render do
+  let Output = h box | class: "belle-output";
+  handle
+    let Ast = belle parse: self.program.text;
+    let VM = belle make-vm: Ast;
+    transcript inspect: VM run-to-completion;
+  with
+    on belle.display(Value) do
+      foreign belle.debugger();
+      transcript inspect: Value;
+      Output add: Value to-output;
+    end
+  end
+
+  h page: "run-page" | add: [
+    h column add: [
+      h top-menu,
+      h box | class: "belle-run-panel" | add: [
+        Output
+      ],
+    ],
+  ];
+end
+
+command module new-program: _ do
+  let Program = new belle-program("Untitled", "");
+  module show: new page-edit(#cell with-value: Program);
+end
+
+command module on: _ load-program: Program do
+  module show: new page-run(Program);
+end
+
+define sample-programs = [
+  new belle-program(
+    "Hello, world",
+    ":rule Why/0 = @set #program @cons ^self ^rest
+                    @display @last %program
+                    @line-break @line-break
+                    @display %program.
+
+      Why! cried Alice,
+      The white rabbit stopped, stared, startled,
+      A rabbit carrying a clock, that I had never seen!
+      The rabbit took his pocket watch,
+      Looked at it for a moment,
+      It is getting late, I must make haste,
+      He sprung forth and entered a small hole in a tree,
+      My! And it gets curiouser still!
+      Left alone, Alice wondered,
+      Would she get his attention by starting with a \"Hello?\"
+    ",
+  ),
+
+  new belle-program(
+    "Fibonacci Spiral",
+    ": rule Round/0 = @set #program @cons ^self ^rest.
+
+      : rule An/0 = @set #a #1
+                    @set #b #1
+                    @set #n #20
+                    @set #fib @cons %a @cons %b @nil
+                    @set #f \[@set #r @add %a %b
+                              @set #a %b
+                              @set #b %r
+                              @set #fib @cons %r %fib
+                              @set #n @sub %n #1
+                              @if @eq %n #0 \[%fib\] \[@apply %f\]\]
+                    @apply %f.
+
+      : rule A/0 = @display %program
+                   @line-break
+                   @display @pretty-print @reverse %fib.
+
+      Round,
+      Well, not quite,
+      Not quite much as a circle, at least,
+      Or an ellipsis,
+      Not anything so ordinary,
+      An spiral?
+      Yes,
+      A spiral.
+    ",
+  ),
+];

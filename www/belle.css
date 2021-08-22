@@ -1,0 +1,53 @@
+#crochet-container .belle-title {
+  text-align: center;
+  font-family: "Parisienne", serif;
+  font-size: 2em;
+}
+
+#crochet-container .start-page .belle-title {
+  font-size: 5em;
+}
+
+#crochet-container .start-description {
+  font-size: 1.3em;
+  text-align: center;
+  white-space: pre;
+}
+
+#crochet-container .start-program-selection {
+  margin-top: 2em;
+  display: flex;
+  align-content: center;
+  justify-content: center;
+}
+
+#crochet-container .belle-program-button {
+  border: 1px dashed #bbb;
+  outline: none;
+  background: none;
+  width: 100px;
+  height: 100px;
+  margin: 0.5em;
+  cursor: pointer;
+}
+
+#crochet-container .belle-program-button .belle-icon {
+  font-size: 36px;
+  color: #777;
+}
+
+#crochet-container .belle-column {
+  display: flex;
+  flex-direction: column;
+}
+
+#crochet-container .belle-row {
+  display: flex;
+  flex-direction: row;
+}
+
+#crochet-container .belle-program-column {
+  align-items: center;
+  margin: 1em;
+  width: 25%;
+}

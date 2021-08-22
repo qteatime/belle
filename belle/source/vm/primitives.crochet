@@ -253,7 +253,7 @@ command vm add-primitive-rules do
     // Display functions
     | rewrite: "@display" arity: 1 with: { VM, _ in
         let Value = VM pop-stack;
-        transcript write: Value to-output;
+        perform belle.display(Value);
       }
 
     | rewrite: "@pretty-print" arity: 1 with: { VM, _ in
@@ -262,6 +262,6 @@ command vm add-primitive-rules do
       }
 
     | rewrite: "@line-break" arity: 0 with: { VM, _ in
-        transcript write: "";
+        perform belle.display(new b-string("\n"));
       }
 end
