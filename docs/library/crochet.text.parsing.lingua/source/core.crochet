@@ -1,0 +1,57 @@
+% crochet
+
+abstract lingua;
+type grammar(ohm-grammar);
+type semantics(ohm-semantics);
+type interval(ohm-interval);
+type parse-tree(ohm-parse-tree);
+
+
+command #lingua grammar: (Source is text)
+  = new grammar(foreign lingua.make-grammar(Source));
+
+command grammar parse: (Source is text) rule: (Rule is text) do
+  let Parse-tree = foreign lingua.parse(self.ohm-grammar, Source, Rule);
+  let Succeeded = foreign lingua.succeeded(Parse-tree);
+  condition
+    when Succeeded => (#result ok: new parse-tree(Parse-tree));
+    always do
+      #result error: (foreign lingua.error-message(Parse-tree));
+    end
+  end
+end
+
+command grammar semantics: (Visitor is record) =
+  new semantics(foreign lingua.make-semantics(self.ohm-grammar, Visitor));
+
+command semantics transform: (Tree is parse-tree) =
+  foreign lingua.apply-semantics(self.ohm-semantics, Tree.ohm-parse-tree);
+
+
+command #lingua visitor-identity
+  = foreign lingua.visitor-identity();
+
+command #lingua visitor-source
+  = foreign lingua.visitor-source();
+
+command #lingua visitor-singleton
+  = foreign lingua.visitor-singleton();
+
+command #lingua visitor-lambda: (Lambda is function)
+  = foreign lingua.visitor-lambda(Lambda);
+
+
+command #lingua interval: Node
+  = new interval(foreign lingua.interval(Node));
+
+command interval position
+  = foreign lingua.interval-position(self.ohm-interval);
+
+command interval range
+  = foreign lingua.interval-range(self.ohm-interval);
+
+command interval source
+  = foreign lingua.interval-source(self.ohm-interval);
+
+command interval annotated-source
+  = foreign lingua.interval-annotated-source(self.ohm-interval);

@@ -17,11 +17,15 @@ Assuming you have Node.js and npm installed:
 Then point your browser to http://localhost:8000. Example programs and
 documentation are embedded in the small IDE.
 
+---
+
 Alternatively, if you don't have Node.js and npm installed, you
 can start any web-browser in the `docs/` folder:
 
     $ cd docs
     $ python3 -m http.server   # note that this http server is really slow
+
+You can also run it directly from the web: https://qteati.me/belle
 
 ## Concept and etymology
 

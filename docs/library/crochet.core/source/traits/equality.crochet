@@ -1,0 +1,5 @@
+% crochet
+
+/// True if two values with an equality trait are not equal.
+command (Left has equality) =/= (Right has equality) =
+  not (Left === Right);
