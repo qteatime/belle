@@ -66,6 +66,9 @@ exports.default = (ffi) => {
     }
     editor.addEventListener("keyup", resize);
     editor.addEventListener("keydown", resize);
+    setTimeout(() => {
+      resize();
+    }, 250);
     return ffi.box(editor);
   });
 

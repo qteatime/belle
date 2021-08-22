@@ -86,7 +86,7 @@ end
 
 command page-start render-program-button: (Program is belle-program) do
   h column | class: "belle-program-column" | add: [
-    h program-button | on: "click" do: (module on: _ load-program: Program) | add: [
+    h program-button | on: "click" do: { _ in module load-program: Program } | add: [
       h icon: "fa-play" | title: "Run [Program.title]",
     ],
     Program.title,
@@ -154,7 +154,10 @@ command page-run render do
 
   h page: "run-page" | add: [
     h column add: [
-      h top-menu,
+      h top-menu: [
+        h menu-link: "Edit"
+          | on: "click" do: { _ in module edit-program: self.program }
+      ],
       h panel | class: "belle-run-panel" | add: [
         Output
       ],
@@ -185,7 +188,11 @@ command module new-program do
   module show: new page-edit(Program);
 end
 
-command module on: _ load-program: Program do
+command module edit-program: Program do
+  module show: new page-edit(Program);
+end
+
+command module load-program: Program do
   module show: new page-run(Program);
 end
 

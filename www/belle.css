@@ -108,6 +108,17 @@
 #crochet-container .navigation {
   margin-bottom: 1.5em;
   border-bottom: 2px solid #ececea;
+  display: flex;
+}
+
+#crochet-container .navigation-left {
+  flex-grow: 0;
+}
+
+#crochet-container .navigation-right {
+  flex-grow: 1;
+  flex-direction: row-reverse;
+  display: flex;
 }
 
 #crochet-container {
@@ -122,7 +133,7 @@
   display: block;
   width: 100%;
   min-height: 100px;
-  font-size: 1.2em;
+  font-size: 1em;
   font-family: "Lora", serif;
   background: #fff;
   padding: 0.5em;
