@@ -1,6 +1,6 @@
 {
   "name": "belle",
-  "target": "*",
+  "target": "browser",
   "native_sources": ["native/native.js"],
   "sources": [
     "source/extensions.crochet",
