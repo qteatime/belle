@@ -10,7 +10,7 @@ local type belle-program(title is text, text is text);
 
 local abstract page;
 local singleton page-start is page;
-local type page-edit(program is cell<belle-program>) is page;
+local type page-edit(program is belle-program) is page;
 local type page-run(program is belle-program) is page;
 
 effect ide with
@@ -94,7 +94,28 @@ command page-start render-program-button: (Program is belle-program) do
 end
 
 command page-edit render do
-  h box add: ["TODO"];
+  let Editor = h code-editor | set-input-content: self.program.text;
+  let Title = h text-input class: "title-input" | set-input-content: self.program.title;
+
+  h page: "edit-page" | add: [
+    h column add: [
+      h top-menu,
+      h panel | class: "belle-edit-panel" | add: [
+        Title,
+        h box | class: "belle-editor-container" | add: [
+          Editor,
+          h box | class: "belle-editor-actions" | add: [
+            h button
+              | class: "belle-action"
+              | on: "click" do: { _ in module run-program-from-editor: Editor title: Title }
+              | add: [
+                  h icon: "fa-play" | title: "Run the program",
+                ]
+          ],
+        ],
+      ],
+    ],
+  ]
 end
 
 command page-run render do
@@ -161,11 +182,17 @@ end
 
 command module new-program do
   let Program = new belle-program("Untitled", "");
-  module show: new page-edit(#cell with-value: Program);
+  module show: new page-edit(Program);
 end
 
 command module on: _ load-program: Program do
   module show: new page-run(Program);
+end
+
+command module run-program-from-editor: Editor title: TitleField do
+  let Source = Editor input-content;
+  let Title = TitleField input-content;
+  module show: new page-run(new belle-program(Title, Source));
 end
 
 define sample-programs = [

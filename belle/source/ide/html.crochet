@@ -50,6 +50,12 @@ command element on: (Event is text) do: (Handler is (Event -> B)) do
   self;
 end
 
+command element input-content = foreign belle.get-contents(self.box);
+command element set-input-content: (Content is text) do
+  foreign belle.set-contents(self.box, Content);
+  self;
+end
+
 command h page: Name =
   h box class: "belle-page [Name]";
 
@@ -88,3 +94,11 @@ command h link =
 
 command h menu-link: Content =
   h link | class: "menu-link" | add: [Content];
+
+command h code-editor =
+  new element(foreign belle.code-editor())
+    | class: "belle-code-editor";
+
+command h text-input =
+  h element: "input"
+    | set-attribute: "type" to: "text";

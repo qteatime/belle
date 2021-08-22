@@ -57,4 +57,24 @@ exports.default = (ffi) => {
     debugger;
     return ffi.nothing;
   });
+
+  ffi.defun("belle.code-editor", () => {
+    const editor = document.createElement("textarea");
+    function resize() {
+      editor.style.height = "auto";
+      editor.style.height = `${Math.max(100, editor.scrollHeight)}px`;
+    }
+    editor.addEventListener("keyup", resize);
+    editor.addEventListener("keydown", resize);
+    return ffi.box(editor);
+  });
+
+  ffi.defun("belle.get-contents", (box) => {
+    return ffi.text(ffi.unbox(box).value);
+  });
+
+  ffi.defun("belle.set-contents", (box, text) => {
+    ffi.unbox(box).value = ffi.text_to_string(text);
+    return box;
+  });
 };
