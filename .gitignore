@@ -1,3 +1,4 @@
 .binary/
 node_modules/
 !docs/**/.binary/
+belle/source/grammar/belle.lingua.crochet
