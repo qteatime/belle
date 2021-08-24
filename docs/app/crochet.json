@@ -8,6 +8,7 @@
     "source/0-types.crochet",
     "source/vm/parser.crochet",
     "source/vm/pretty-print.crochet",
+    "source/vm/rewrite.crochet",
     "source/vm/evaluator.crochet",
     "source/vm/intrinsics.crochet",
     "source/vm/primitives.crochet",

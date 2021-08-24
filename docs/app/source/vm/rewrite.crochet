@@ -1,0 +1,91 @@
+% crochet
+
+// Accessors
+command form--rule arity =
+  #integer try-parse: self.arity
+    | value-or-panic: "internal: invalid integer";
+
+command user-rewrite-rule arity = self.arity;
+command native-rewrite-rule arity = self.arity;
+
+command user-rewrite-rule pattern = self.form.pattern;
+command native-rewrite-rule pattern = self.pattern;
+
+
+implement word-pattern for native-word-pattern;
+command native-word-pattern word = self.word;
+
+implement word-pattern for pattern--word;
+command pattern--word word = self.word;
+
+
+command rewrite-rule is-immediate = self arity === 0;
+
+
+// Conversions
+command form--rule as rewrite-rule =
+  new user-rewrite-rule(self arity, self);
+
+
+// Ordering (we need to apply more specific rules first in disambiguation)
+command native-word-pattern distance = 0;
+command pattern--word distance = 0;
+command pattern--anything distance = 1;
+
+command rewrite-rule distance = self pattern distance;
+
+
+// Filtering
+command rewrite-rule applies-to: (Word is text) do
+  self pattern applies-to: Word;
+end
+
+command pattern--word applies-to: (Word is text) do
+  self.word === Word;
+end
+
+command native-word-pattern applies-to: (Word is text) do
+  self.word === Word;
+end
+
+command pattern--anything applies-to: _ do
+  true;
+end
+
+
+// Trie-based optimisation
+command #rewrite-rule-trie empty =
+  new rewrite-rule-trie(#map empty, []);
+
+command rewrite-rule-trie insert: (Rule is rewrite-rule) =
+  self insert: Rule pattern: Rule pattern;
+
+command rewrite-rule-trie insert: (Rule is rewrite-rule) pattern: (Pattern is pattern--anything) =
+  new rewrite-rule-trie(
+    self.trie,
+    self.fallbacks append: Rule | sort-by: { A, B in A distance compare-to: B distance }
+  );
+
+command rewrite-rule-trie insert: (Rule is rewrite-rule) pattern: (Pattern has word-pattern) =
+  new rewrite-rule-trie(
+    self.trie at: Pattern word put: Rule,
+    self.fallbacks
+  );
+
+command rewrite-rule-trie find-rule: (Word is text) do
+  condition
+    when self.trie contains-key: Word => #result ok: (self.trie at: Word);
+    always => self.fallbacks find-first: (_ applies-to: Word);
+  end
+end
+
+
+// Manipulating rules
+command vm add-rule: (Rule is rewrite-rule) do
+  self.rules <- self.rules value insert: Rule;
+  self;
+end
+
+command vm find-rule: (Word is text) do
+  self.rules value find-rule: Word;
+end

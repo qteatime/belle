@@ -28,8 +28,7 @@ end
 
 
 command vm evaluate: (X is form--rule) do
-  self.rules <- self.rules value append: (X as rewrite-rule);
-  self sort-rules;
+  self add-rule: (X as rewrite-rule);
 end
 
 command vm evaluate: (X is form--variable) do
@@ -122,7 +121,7 @@ command b-native-lambda update-capture: Capture =
 
 // -- Rewriting
 command vm rewrite: (Word is text) do
-  let Match = self.rules value find-first: (self rule: _ applies-to: Word);
+  let Match = self find-rule: Word;
   condition
     when Match is error => self;
     when Match is ok do
@@ -168,49 +167,3 @@ end
 
 command module form: X with-context: _ program: _ =
   X;
-
-
-command vm rule: (Rule is rewrite-rule) applies-to: (Word is text) do
-  Rule pattern applies-to: Word;
-end
-
-
-command pattern--word applies-to: (Word is text) do
-  self.word === Word;
-end
-
-command native-word-pattern applies-to: (Word is text) do
-  self.word === Word;
-end
-
-command pattern--anything applies-to: _ do
-  true;
-end
-
-
-command form--rule arity =
-  #integer try-parse: self.arity
-    | value-or-panic: "internal: invalid integer";
-
-command user-rewrite-rule arity = self.arity;
-command native-rewrite-rule arity = self.arity;
-
-command user-rewrite-rule pattern = self.form.pattern;
-command native-rewrite-rule pattern = self.pattern;
-
-command rewrite-rule is-immediate = self arity === 0;
-
-command form--rule as rewrite-rule =
-  new user-rewrite-rule(self arity, self);
-
-
-command native-word-pattern distance = 0;
-command pattern--word distance = 0;
-command pattern--anything distance = 1;
-
-command rewrite-rule distance = self pattern distance;
-
-command vm sort-rules do
-  self.rules <- self.rules value sort-by: { A, B in A distance compare-to: B distance };
-  self;
-end

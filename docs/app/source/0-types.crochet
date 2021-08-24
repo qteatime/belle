@@ -23,11 +23,20 @@ abstract rewrite-rule;
 type native-rewrite-rule(pattern is pattern, arity is integer, run is ((vm, text) -> vm)) is rewrite-rule;
 type user-rewrite-rule(arity is integer, form is form--rule) is rewrite-rule;
 
+type rewrite-rule-trie(
+  trie is map<text, rewrite-rule>,
+  fallbacks is list<rewrite-rule>
+);
+
+trait word-pattern with
+  command A word;
+end
+
 // -- The VM
 type vm(bindings is cell<map<text, value>>,
         stack is cell<list<value>>,
         program is cell<list<form>>,
-        rules is cell<list<rewrite-rule>>);
+        rules is cell<rewrite-rule-trie>);
 
 // -- Execution effects
 effect belle with
