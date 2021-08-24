@@ -22,8 +22,7 @@ end
 
 
 command vm rewrite: (Word is text) arity: (N is integer) with: (Fun is ((vm, text) -> vm)) do
-  self.rules <- self.rules value append: new native-rewrite-rule(new native-word-pattern(Word), N, Fun);
-  self;
+  self add-rule: new native-rewrite-rule(new native-word-pattern(Word), N, Fun);
 end
 
 command vm add-primitive-rules do
@@ -294,7 +293,7 @@ command vm add-prelude do
   let Rules = Prelude.forms
                 | keep-if: { X in X is form--rule }
                 | map: (_ as rewrite-rule);
-  self.rules <- Rules ++ self.rules value;
+  for Rule in Rules do self add-rule: Rule end;
   self;
 end
 

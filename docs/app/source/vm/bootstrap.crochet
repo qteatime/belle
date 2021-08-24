@@ -8,7 +8,6 @@ command belle make-vm: (Program is program) do
     #cell with-value: [], // defined rewrite rules
   )
     | add-primitive-rules
-    | add-prelude
-    | sort-rules;
+    | add-prelude;
 end
 
